@@ -1,34 +1,35 @@
-import { movieDB, type Movie } from "../database/mockDb.js";
+import { movieDB, type MovieModel } from "../database/mockDb.js";
+import { prisma } from "../db/prismaClient.js"
 
 export class MovieRepository {
-  getAllMovies(): Movie[] {
-    return movieDB;
+  getAllMovies(): MovieModel[] {
+    return  prisma.movie.findMany();;
   }
-  getById(id: number): Movie | undefined {
+  getById(id: number): MovieModel | undefined {
     //return movie or undefine
     return movieDB.find((m) => m.id === id); //m.id equals to the id given by user
   }
-  getByTitle(title: string): Movie | undefined {
+  getByTitle(title: string): MovieModel | undefined {
     return movieDB.find(
       (m) => m.title.toLocaleLowerCase() === title.toLocaleLowerCase(),
     );
   }
-  create(movieData: Omit<Movie, "id">): Movie {
+  create(movieData: Omit<MovieModel, "id">): MovieModel {
     let newId = 1;
     if (movieDB.length > 0) {
-      const lastMovie = movieDB[movieDB.length - 1];//length-1 --> array start counting from 0,length 1, index is 0 here we need index
+      const lastMovie = movieDB[movieDB.length - 1];
       if (lastMovie) {
         newId = lastMovie.id + 1;
       }
     }
-    const newMovie: Movie = {
+    const newMovie: MovieModel = {
       id: newId,
       ...movieData,
     };
     movieDB.push(newMovie);
     return newMovie;
   }
-  deleteById(id:number):Movie|null{
+  deleteById(id:number):MovieModel|null{
     const movieIndex =movieDB.findIndex((m)=>m.id===id);
 
     if(movieIndex===-1){
@@ -36,7 +37,7 @@ export class MovieRepository {
     }
     return movieDB.splice(movieIndex,1)[0] ||null;
   }
-  update(id:number, movieData:Omit<Movie,'id'>):Movie{//except id received other details
+  update(id:number, movieData:Omit<MovieModel,'id'>):MovieModel{//except id received other details
     const index = movieDB.findIndex((m)=>m.id===id);
 
     if(index===-1){

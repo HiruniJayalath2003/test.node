@@ -1,12 +1,12 @@
 import { error } from "node:console";
-import type { Movie } from "../database/mockDb.js";
+import type { MovieModel } from "../database/mockDb.js";
 import { MovieRepository } from "../repository/movie.repository.js";
 
 export class MovieService {
   private movieRepository = new MovieRepository(); // movie service needs a movie repo to get raw data from repository
 
   //new method
-  getMovies(genre?: string, year?: string): Movie[] {
+  getMovies(genre?: string, year?: string): MovieModel[] {
     let movies = this.movieRepository.getAllMovies();
 
     if (genre) {
@@ -22,7 +22,7 @@ export class MovieService {
     }
     return movies;
   }
-  getMovieByTitle(title: string): Movie {
+  getMovieByTitle(title: string): MovieModel {
     const foundTitle = this.movieRepository.getByTitle(title);
 
     if (!foundTitle) {
@@ -32,7 +32,7 @@ export class MovieService {
     return foundTitle;
   }
   //new method
-  getMovieById(id: number): Movie {
+  getMovieById(id: number): MovieModel {
     //return movie
     const foundMovie = this.movieRepository.getById(id);
 
@@ -44,7 +44,7 @@ export class MovieService {
   }
 
   //receive movie info and pass it to repository to create new movie
-  addMovie(title: string, genre: string, releasedYear: number): Movie {
+  addMovie(title: string, genre: string, releasedYear: number): MovieModel {
     const createNew = this.movieRepository.create({
       //calls the create method in movie repo and immediately return what it returns
       title,
@@ -54,7 +54,7 @@ export class MovieService {
     return createNew;
   }
 
-  deleteMovie(id: number): Movie {
+  deleteMovie(id: number): MovieModel {
     const deleteMovie = this.movieRepository.deleteById(id);
 
     if (!deleteMovie) {
@@ -62,7 +62,7 @@ export class MovieService {
     }
     return deleteMovie;
   }
-  updateMovie(id:number,title: string, genre: string, releasedYear: number): Movie {
+  updateMovie(id:number,title: string, genre: string, releasedYear: number): MovieModel {
     const movie = this.movieRepository.getById(id);
 
     if (!movie) {
