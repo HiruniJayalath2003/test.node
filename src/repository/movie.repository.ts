@@ -1,10 +1,25 @@
 import { movieDB, type MovieModel } from "../database/mockDb.js";
 import { prisma } from "../db/prismaClient.js"
+import type { Movie } from "../generated/prisma/client.js";
 
 export class MovieRepository {
-  getAllMovies(): MovieModel[] {
-    return  prisma.movie.findMany();;
-  }
+  async getAllMovies():Promise<Movie[]> {
+    return prisma.movie.findMany(); // use prisma client go to movie table find everything
+  }//insted of returning data from raw db we are getting movie modal from prisma client
+  
+  //we have get all func which await prisma return all the movies as a promise
+  
+
+
+
+
+
+
+
+
+
+
+  
   getById(id: number): MovieModel | undefined {
     //return movie or undefine
     return movieDB.find((m) => m.id === id); //m.id equals to the id given by user

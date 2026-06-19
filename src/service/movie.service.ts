@@ -1,4 +1,5 @@
 import { error } from "node:console";
+import type { Movie } from "../generated/prisma/client.js";
 import type { MovieModel } from "../database/mockDb.js";
 import { MovieRepository } from "../repository/movie.repository.js";
 
@@ -6,8 +7,9 @@ export class MovieService {
   private movieRepository = new MovieRepository(); // movie service needs a movie repo to get raw data from repository
 
   //new method
-  getMovies(genre?: string, year?: string): MovieModel[] {
-    let movies = this.movieRepository.getAllMovies();
+  async getMovies(genre?: string, year?: string):Promise <Movie[]> {//promis to give us a movie array
+    let movies = await this.movieRepository.getAllMovies();//gives us a promis so we have to await
+// we have to wait until gives us movies so we use await we can't use await alone so we need to use async 
 
     if (genre) {
       movies = movies.filter(

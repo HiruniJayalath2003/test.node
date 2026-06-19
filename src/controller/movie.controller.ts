@@ -5,11 +5,11 @@ import { error } from "node:console";
 export class MovieController {
   private movieService = new MovieService();
 
-  getAllMovies = (req: Request, res: Response) => {
+  getAllMovies =async (req: Request, res: Response) => {
     const genreQuery = req.query.genre as string;
     const yearquery = req.query.year as string;
 
-    const movies = this.movieService.getMovies(genreQuery, yearquery);
+    const movies =await this.movieService.getMovies(genreQuery, yearquery);//we have to wait
     res.json({
       success: true,
       data: movies,
