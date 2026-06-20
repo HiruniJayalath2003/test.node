@@ -7,9 +7,10 @@ export class MovieService {
   private movieRepository = new MovieRepository(); // movie service needs a movie repo to get raw data from repository
 
   //new method
-  async getMovies(genre?: string, year?: string):Promise <Movie[]> {//promis to give us a movie array
-    let movies = await this.movieRepository.getAllMovies();//gives us a promis so we have to await
-// we have to wait until gives us movies so we use await we can't use await alone so we need to use async 
+  async getMovies(genre?: string, year?: string): Promise<Movie[]> {
+    //promis to give us a movie array
+    let movies = await this.movieRepository.getAllMovies(); //gives us a promis so we have to await
+    // we have to wait until gives us movies so we use await we can't use await alone so we need to use async
 
     if (genre) {
       movies = movies.filter(
@@ -24,8 +25,9 @@ export class MovieService {
     }
     return movies;
   }
-  getMovieByTitle(title: string): MovieModel {
-    const foundTitle = this.movieRepository.getByTitle(title);
+
+  async getMovieByTitle(title: string): Promise<Movie> {
+    const foundTitle = await this.movieRepository.getByTitle(title);
 
     if (!foundTitle) {
       throw new Error("Title Not Found");
@@ -34,9 +36,9 @@ export class MovieService {
     return foundTitle;
   }
   //new method
-  getMovieById(id: number): MovieModel {
+  async getMovieById(id: number): Promise<Movie> {
     //return movie
-    const foundMovie = this.movieRepository.getById(id);
+    const foundMovie = await this.movieRepository.getById(id);
 
     if (!foundMovie) {
       //if not found movie throw an error
@@ -44,17 +46,34 @@ export class MovieService {
     }
     return foundMovie;
   }
+  async addMovie(
+    title: string,
+    genre: string,
+    releasedYear: number,
+  ): Promise<Movie> {
+    
+    const existingMovie = await this.movieRepository.getByTitle(title);
 
-  //receive movie info and pass it to repository to create new movie
-  addMovie(title: string, genre: string, releasedYear: number): MovieModel {
-    const createNew = this.movieRepository.create({
-      //calls the create method in movie repo and immediately return what it returns
+    if (existingMovie) {
+      throw new Error("Movie already exist");
+    }
+    return await this.movieRepository.create({
       title,
       genre,
-      releasedYear, //create objects
+      releasedYear,
     });
-    return createNew;
   }
+
+  //receive movie info and pass it to repository to create new movie
+  // addMovie(title: string, genre: string, releasedYear: number): MovieModel {
+  //   const createNew = this.movieRepository.create({
+  //     //calls the create method in movie repo and immediately return what it returns
+  //     title,
+  //     genre,
+  //     releasedYear, //create objects
+  //   });
+  //   return createNew;
+  // }
 
   deleteMovie(id: number): MovieModel {
     const deleteMovie = this.movieRepository.deleteById(id);
@@ -64,7 +83,12 @@ export class MovieService {
     }
     return deleteMovie;
   }
-  updateMovie(id:number,title: string, genre: string, releasedYear: number): MovieModel {
+  updateMovie(
+    id: number,
+    title: string,
+    genre: string,
+    releasedYear: number,
+  ): MovieModel {
     const movie = this.movieRepository.getById(id);
 
     if (!movie) {
@@ -75,6 +99,6 @@ export class MovieService {
       genre,
       releasedYear,
     });
-    return updateNew
+    return updateNew;
   }
 }

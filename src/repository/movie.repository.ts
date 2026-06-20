@@ -9,40 +9,22 @@ export class MovieRepository {
   
   //we have get all func which await prisma return all the movies as a promise
   
-
-
-
-
-
-
-
-
-
-
   
-  getById(id: number): MovieModel | undefined {
+  async getById(id: number): Promise<Movie | null> {
     //return movie or undefine
-    return movieDB.find((m) => m.id === id); //m.id equals to the id given by user
+    return await prisma.movie.findUnique({
+      where: {id},  //select * from movie where id =1
+    }); //
   }
-  getByTitle(title: string): MovieModel | undefined {
-    return movieDB.find(
-      (m) => m.title.toLocaleLowerCase() === title.toLocaleLowerCase(),
-    );
+  async getByTitle(title: string): Promise <Movie | null> {
+    return await prisma.movie.findUnique({
+      where:{title:title},
+    });
   }
-  create(movieData: Omit<MovieModel, "id">): MovieModel {
-    let newId = 1;
-    if (movieDB.length > 0) {
-      const lastMovie = movieDB[movieDB.length - 1];
-      if (lastMovie) {
-        newId = lastMovie.id + 1;
-      }
-    }
-    const newMovie: MovieModel = {
-      id: newId,
-      ...movieData,
-    };
-    movieDB.push(newMovie);
-    return newMovie;
+  async create(movieData: Omit<MovieModel, "id"|"createAt">): Promise<Movie>{
+    return await prisma.movie.create({
+      data:movieData
+    })
   }
   deleteById(id:number):MovieModel|null{
     const movieIndex =movieDB.findIndex((m)=>m.id===id);
