@@ -105,7 +105,7 @@ export class MovieController {
       });
     } catch (error: any) {
       if (error.message === "Not_Found") {
-        res.status(400).json({
+        res.status(409).json({
           success: false,
           message: `Movie With a title ${title} already exist`,
         });
@@ -117,85 +117,85 @@ export class MovieController {
       }
     }
   };
+
+  deleteMovie = async (req: Request, res: Response) => {
+    const deleteIdAsString = req.params.id as string;
+    const movieId = parseInt(deleteIdAsString);
+
+    if (isNaN(movieId)) {
+      res.status(400).json({
+        success: false,
+        message: `Invalid movie id , It should be a number`,
+      });
+      return;
+    }
+    try {
+      const deletedMovie = await this.movieService.deleteMovie(movieId);
+      res.json({
+        success: true,
+        message: `Movie with ID ${movieId} deleted successfully`,
+        data: deletedMovie,
+      });
+    } catch (error: any) {
+      if (error.message === "Movie not found") {
+        res.status(404).json({
+          success: false,
+          message: `Movie not found for Id ${movieId}`,
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: `Internal server error`,
+        });
+      }
+    }
+  };
+
+  updateMovie =async (req: Request, res: Response) => {
+    const movieIdAsString = req.params.id as string;
+    const movieID = parseInt(movieIdAsString);
+
+    if (isNaN(movieID)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Movie ID",
+      });
+    }
+
+    const { title, genre, releasedYear } = req.body;
+
+    if (!title || !genre || !releasedYear) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+
+    try {
+      const updatedMovie = await this.movieService.updateMovie(
+        movieID,
+        title,
+        genre,
+        releasedYear,
+      );
+
+      return res.json({
+        success: true,
+        data: updatedMovie,
+        message: "Movie updated successfully",
+      });
+    } catch (error: any) {
+      if (error.message === "Not_Found") {
+        return res.status(404).json({
+          success: false,
+          message: `Movie not found for ID ${movieID}`,
+        });
+      }
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  };
 }
 
-//   deleteMovie = (req: Request, res: Response) => {
-//     const deleteIdAsString = req.params.id as string;
-//     const movieId = parseInt(deleteIdAsString);
-
-//     if (isNaN(movieId)) {
-//       res.status(400).json({
-//         success: false,
-//         message: `Invalid movie id , It should be a number`,
-//       });
-//       return;
-//     }
-//     try {
-//       const deletedMovie = this.movieService.deleteMovie(movieId);
-//       res.json({
-//         success: true,
-//         message: `Movie with ID ${movieId} deleted successfully`,
-//         data: deletedMovie,
-//       });
-//     } catch (error: any) {
-//       if (error.message === "Movie not found") {
-//         res.status(404).json({
-//           success: false,
-//           message: `Movie not found for Id ${movieId}`,
-//         });
-//       } else {
-//         res.status(500).json({
-//           success: false,
-//           message: `Internal server error`,
-//         });
-//       }
-//     }
-//   };
-//   // In MovieController
-//   updateMovie = (req: Request, res: Response) => {
-//     const movieIdAsString = req.params.id as string;
-//     const movieID = parseInt(movieIdAsString);
-
-//     if (isNaN(movieID)) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid Movie ID",
-//       });
-//     }
-
-//     const { title, genre, releasedYear } = req.body;
-
-//     if (!title || !genre || !releasedYear) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Missing required fields",
-//       });
-//     }
-
-//     try {
-//       const updatedMovie = this.movieService.updateMovie(
-//         movieID,
-//         title,
-//         genre,
-//         releasedYear,
-//       );
-
-//       return res.json({
-//         success: true,
-//         data: updatedMovie,
-//         message: "Movie updated successfully",
-//       });
-//     } catch (error: any) {
-//       if (error.message === "Not_Found") {
-//         return res.status(404).json({
-//           success: false,
-//           message: `Movie not found for ID ${movieID}`,
-//         });
-//       }
-//       return res.status(500).json({
-//         success: false,
-//         message: "Internal server error",
-//       });
-//     }
-//   };
-// }

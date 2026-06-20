@@ -1,6 +1,4 @@
-import { error } from "node:console";
 import type { Movie } from "../generated/prisma/client.js";
-import type { MovieModel } from "../database/mockDb.js";
 import { MovieRepository } from "../repository/movie.repository.js";
 
 export class MovieService {
@@ -61,40 +59,30 @@ export class MovieService {
       title,
       genre,
       releasedYear,
+      
     });
   }
 
-  //receive movie info and pass it to repository to create new movie
-  // addMovie(title: string, genre: string, releasedYear: number): MovieModel {
-  //   const createNew = this.movieRepository.create({
-  //     //calls the create method in movie repo and immediately return what it returns
-  //     title,
-  //     genre,
-  //     releasedYear, //create objects
-  //   });
-  //   return createNew;
-  // }
-
-  deleteMovie(id: number): MovieModel {
-    const deleteMovie = this.movieRepository.deleteById(id);
+  async deleteMovie(id: number): Promise <Movie> {
+    const deleteMovie = await this.movieRepository.deleteById(id);
 
     if (!deleteMovie) {
       throw new Error("Movie not found");
     }
     return deleteMovie;
   }
-  updateMovie(
+  async updateMovie(
     id: number,
     title: string,
     genre: string,
     releasedYear: number,
-  ): MovieModel {
-    const movie = this.movieRepository.getById(id);
+  ): Promise<Movie> {
+    const movie = await this.movieRepository.getById(id);
 
     if (!movie) {
       throw new Error("Not_Found");
     }
-    const updateNew = this.movieRepository.update(id, {
+    const updateNew = await this.movieRepository.update(id, {
       title,
       genre,
       releasedYear,
