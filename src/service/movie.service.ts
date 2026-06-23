@@ -6,22 +6,18 @@ export class MovieService {
 
   //new method
   async getMovies(genre?: string, year?: string): Promise<Movie[]> {
-    //promis to give us a movie array
-    let movies = await this.movieRepository.getAllMovies(); //gives us a promis so we have to await
-    // we have to wait until gives us movies so we use await we can't use await alone so we need to use async
+    const filters: { genre?: string; year?: number } = {};//just create filters first
 
     if (genre) {
-      movies = movies.filter(
-        (m) => m.genre.toLowerCase() === genre.toLocaleLowerCase(),
-      );
+      filters.genre = genre;
     }
     if (year) {
-      const releasedYear = parseInt(year);
-      if (!isNaN(releasedYear)) {
-        movies = movies.filter((m) => m.releasedYear === releasedYear);
+      const parseYear = parseInt(year);
+      if (!isNaN(parseYear)) {
+        filters.year = parseYear;
       }
     }
-    return movies;
+    return await this.movieRepository.getAllMovies(filters);
   }
 
   async getMovieByTitle(title: string): Promise<Movie> {
@@ -49,7 +45,6 @@ export class MovieService {
     genre: string,
     releasedYear: number,
   ): Promise<Movie> {
-    
     const existingMovie = await this.movieRepository.getByTitle(title);
 
     if (existingMovie) {
@@ -59,11 +54,10 @@ export class MovieService {
       title,
       genre,
       releasedYear,
-      
     });
   }
 
-  async deleteMovie(id: number): Promise <Movie> {
+  async deleteMovie(id: number): Promise<Movie> {
     const deleteMovie = await this.movieRepository.deleteById(id);
 
     if (!deleteMovie) {

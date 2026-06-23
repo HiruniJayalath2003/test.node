@@ -1,13 +1,27 @@
-import { movieDB, type MovieModel } from "../database/mockDb.js";
+//import { movieDB, type MovieModel } from "../database/mockDb.js";
 import { prisma } from "../db/prismaClient.js";
 import type { Movie } from "../generated/prisma/client.js";
 
 export class MovieRepository {
-  async getAllMovies(): Promise<Movie[]> {
-    return prisma.movie.findMany(); // use prisma client go to movie table find everything
+  async getAllMovies(filters?: {genre?:string, year?:number}): Promise<Movie[]> {
+    const whereClause :any = {};
+
+    if(filters?.genre){ //if the genre is given
+      whereClause.genre= {
+        equals:filters.genre, //where genre =genre
+        mode:"insensitive", //case insensitive match for genre-->same as to lower case
+      }
+    }
+    if(filters?.year){
+      whereClause.releasedYear =filters.year;
+    }
+    return await prisma.movie.findMany({
+      where:whereClause
+    }); // use prisma client go to movie table find everything
   } //insted of returning data from raw db we are getting movie modal from prisma client
 
   //we have get all func which await prisma return all the movies as a promise
+
 
   async getById(id: number): Promise<Movie | null> {
     //return movie or undefine
