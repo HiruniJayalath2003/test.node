@@ -26,6 +26,16 @@ export const createMovieSchema = z.object({
         new Date().getFullYear() + 5,
         "Released year should not be in the future",
       ),
+    rating: z
+      .number()
+      .min(0, "Rating should be at least 0.")
+      .max(10, "Rating should be at most 10.")
+      .default(0.0),
+
+    description: z
+      .string()
+      .max(500, "Description should be at most 500 characters long.")
+      .optional(),
   }),
 });
 export type createMoviInput = z.infer<typeof createMovieSchema>;

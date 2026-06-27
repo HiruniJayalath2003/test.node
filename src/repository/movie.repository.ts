@@ -2,26 +2,54 @@
 import { prisma } from "../db/prismaClient.js";
 import type { Movie } from "../generated/prisma/client.js";
 
-export class MovieRepository {
-  async getAllMovies(filters?: {genre?:string, year?:number}): Promise<Movie[]> {
-    const whereClause :any = {};
+interface FetchMovieArgs {
+  page: number;
+  limit: number;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  genre?: string | undefined;
+  year?: number | undefined;
+}
 
-    if(filters?.genre){ //if the genre is given
-      whereClause.genre= {
-        equals:filters.genre, //where genre =genre
-        mode:"insensitive", //case insensitive match for genre-->same as to lower case
-      }
+export class MovieRepository {
+  async getAll(
+    args: FetchMovieArgs,
+  ): Promise<{ movies: Movie[]; total: number }> {
+    const { page, limit, sortBy, sortOrder, genre, year } = args;
+
+    const whereClause: any = {};
+
+    if (genre) {
+      whereClause.genre = {
+        equals: genre, // where genre = genre
+        mode: "insensitive", // case-insensitive match for the genre - Action, action
+      };
     }
-    if(filters?.year){
-      whereClause.releasedYear =filters.year;
+
+    if (year) {
+      whereClause.releasedYear = year; // where releasedYear = year
     }
-    return await prisma.movie.findMany({
-      where:whereClause
-    }); // use prisma client go to movie table find everything
+
+    const skip = (page - 1) * limit;
+
+    const [movies, total] = await prisma.$transaction([
+      prisma.movie.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+      }),
+      prisma.movie.count({ where: whereClause }),
+    ]);
+
+    return { movies, total };
+
+    // use prisma client go to movie table find everything
   } //insted of returning data from raw db we are getting movie modal from prisma client
 
   //we have get all func which await prisma return all the movies as a promise
-
 
   async getById(id: number): Promise<Movie | null> {
     //return movie or undefine

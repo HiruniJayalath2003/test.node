@@ -6,7 +6,7 @@ export class MovieService {
 
   //new method
   async getMovies(genre?: string, year?: string): Promise<Movie[]> {
-    const filters: { genre?: string; year?: number } = {};//just create filters first
+    const filters: { genre?: string; year?: number } = {}; //just create filters first
 
     if (genre) {
       filters.genre = genre;
@@ -44,6 +44,8 @@ export class MovieService {
     title: string,
     genre: string,
     releasedYear: number,
+    rating?: number,
+    description?: string,
   ): Promise<Movie> {
     const existingMovie = await this.movieRepository.getByTitle(title);
 
@@ -54,6 +56,8 @@ export class MovieService {
       title,
       genre,
       releasedYear,
+      rating: rating ?? 0.0,
+      description: description || "",
     });
   }
 
@@ -70,6 +74,8 @@ export class MovieService {
     title: string,
     genre: string,
     releasedYear: number,
+    rating?: number,
+    description?: string,
   ): Promise<Movie> {
     const movie = await this.movieRepository.getById(id);
 
@@ -80,6 +86,8 @@ export class MovieService {
       title,
       genre,
       releasedYear,
+      rating: rating ?? 0.0,
+      description: description || "",
     });
     return updateNew;
   }

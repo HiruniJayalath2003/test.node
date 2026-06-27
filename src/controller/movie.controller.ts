@@ -83,7 +83,7 @@ export class MovieController {
 
   createMovie = async (req: Request, res: Response): Promise<void> => {
     //why promise void  - we are not return anything we only attach value to the response
-    const { title, genre, releasedYear } = req.body;
+    const { title, genre, releasedYear, rating, description } = req.body;
 
     if (!title || !genre || !releasedYear) {
       res.status(400).json({
@@ -97,6 +97,8 @@ export class MovieController {
         title,
         genre,
         releasedYear,
+        rating, 
+        description,
       );
       res.status(201).json({
         success: true,
@@ -162,7 +164,7 @@ export class MovieController {
       });
     }
 
-    const { title, genre, releasedYear } = req.body;
+    const { title, genre, releasedYear,rating, description } = req.body;
 
     if (!title || !genre || !releasedYear) {
       return res.status(400).json({
@@ -177,6 +179,7 @@ export class MovieController {
         title,
         genre,
         releasedYear,
+        rating, description,
       );
 
       return res.json({
