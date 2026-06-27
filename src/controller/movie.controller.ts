@@ -1,21 +1,35 @@
 import type { Request, Response } from "express";
 import { MovieService } from "../service/movie.service.js";
-import { error } from "node:console";
+import type { GetMoviesQueryInput } from "../Schema/movie.query.schema.js";
 
 export class MovieController {
   private movieService = new MovieService();
 
   getAllMovies = async (req: Request, res: Response) => {
-    const genreQuery = req.query.genre as string;
-    const yearquery = req.query.year as string;
+    const queryFilters = req.validated.query as GetMoviesQueryInput;
 
-    const movies = await this.movieService.getMovies(genreQuery, yearquery); //we have to wait
+    const { movies, meta } =
+      await this.movieService.getPaginatedMovies(queryFilters);
+
     res.json({
       success: true,
       data: movies,
-      count: movies.length,
+      meta,
     });
   };
+
+  // getAllMovies = async (req: Request, res: Response) => {
+  //   const genreQuery = req.query.genre as string;
+  //   const yearquery = req.query.year as string;
+
+  //   const movies = await this.movieService.getMovies(genreQuery, yearquery); //we have to wait
+
+  //   res.json({
+  //     success: true,
+  //     data: movies,
+  //     count: movies.length,
+  //   });
+  // };
   getById = async (req: Request, res: Response) => {
     const movieIdAsString = req.params.id as string;
     const movieID = parseInt(movieIdAsString); //to get no
@@ -97,7 +111,7 @@ export class MovieController {
         title,
         genre,
         releasedYear,
-        rating, 
+        rating,
         description,
       );
       res.status(201).json({
@@ -153,7 +167,7 @@ export class MovieController {
     }
   };
 
-  updateMovie =async (req: Request, res: Response) => {
+  updateMovie = async (req: Request, res: Response) => {
     const movieIdAsString = req.params.id as string;
     const movieID = parseInt(movieIdAsString);
 
@@ -164,7 +178,7 @@ export class MovieController {
       });
     }
 
-    const { title, genre, releasedYear,rating, description } = req.body;
+    const { title, genre, releasedYear, rating, description } = req.body;
 
     if (!title || !genre || !releasedYear) {
       return res.status(400).json({
@@ -179,7 +193,8 @@ export class MovieController {
         title,
         genre,
         releasedYear,
-        rating, description,
+        rating,
+        description,
       );
 
       return res.json({
@@ -201,4 +216,3 @@ export class MovieController {
     }
   };
 }
-

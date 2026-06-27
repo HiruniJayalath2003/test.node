@@ -9,10 +9,10 @@ interface FetchMovieArgs {
   sortOrder: "asc" | "desc";
   genre?: string | undefined;
   year?: number | undefined;
-}
+}//to fetch movies
 
 export class MovieRepository {
-  async getAll(
+  async getAllMovies(
     args: FetchMovieArgs,
   ): Promise<{ movies: Movie[]; total: number }> {
     const { page, limit, sortBy, sortOrder, genre, year } = args;

@@ -2,7 +2,7 @@ import {Router} from "express";
 import { MovieController} from "../controller/movie.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { createMovieSchema } from "../Schema/movie.schema.js";
-import { getMoviesQuerySchema } from "./movie.query.schema.js";
+import { getMoviesQuerySchema } from "../Schema/movie.query.schema.js";
 // import { getMoviesQuerySchema } from "../schemas/movie.query.schema.js";
 
 const movieRouter =Router();

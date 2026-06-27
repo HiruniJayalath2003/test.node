@@ -1,24 +1,51 @@
 import type { Movie } from "../generated/prisma/client.js";
 import { MovieRepository } from "../repository/movie.repository.js";
+import type { GetMoviesQueryInput } from "../Schema/movie.query.schema.js";
 
 export class MovieService {
   private movieRepository = new MovieRepository(); // movie service needs a movie repo to get raw data from repository
 
-  //new method
-  async getMovies(genre?: string, year?: string): Promise<Movie[]> {
-    const filters: { genre?: string; year?: number } = {}; //just create filters first
+    async getPaginatedMovies(filters: GetMoviesQueryInput) {
+    const parsedYear = filters.year ? parseInt(filters.year) : undefined;
 
-    if (genre) {
-      filters.genre = genre;
-    }
-    if (year) {
-      const parseYear = parseInt(year);
-      if (!isNaN(parseYear)) {
-        filters.year = parseYear;
-      }
-    }
-    return await this.movieRepository.getAllMovies(filters);
+    const { movies, total } = await this.movieRepository.getAllMovies({
+      page: filters.page,
+      limit: filters.limit,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      genre: filters.genre,
+      year: parsedYear,
+    });
+
+    const totalPages = Math.ceil(total / filters.limit);
+
+    return {
+      movies,
+      meta: {
+        totalItems: total,
+        itemCount: movies.length,
+        itemsPerPage: filters.limit,
+        currentPage: filters.page,
+        totalPages,
+      },
+    };
   }
+
+  //new method
+  // async getMovies(genre?: string, year?: string): Promise<Movie[]> {
+  //   const filters: { genre?: string; year?: number } = {}; //just create filters first
+
+  //   if (genre) {
+  //     filters.genre = genre;
+  //   }
+  //   if (year) {
+  //     const parseYear = parseInt(year);
+  //     if (!isNaN(parseYear)) {
+  //       filters.year = parseYear;
+  //     }
+  //   }
+  //   return await this.movieRepository.getAllMovies(filters);
+  // }
 
   async getMovieByTitle(title: string): Promise<Movie> {
     const foundTitle = await this.movieRepository.getByTitle(title);
